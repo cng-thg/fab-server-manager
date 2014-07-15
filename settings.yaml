@@ -1,0 +1,17 @@
+packages:
+  - ufw
+  - fail2ban
+
+names:
+  - Thiago
+  - Felipe
+
+ssh:
+  template: 'sshd_config'
+  source: 'templates'
+  destination: '/etc/ssh/'
+  settings:
+    ssh_port: 8200
+    ssh_root_login: 'no'
+    ssh_use_pam: 'no'
+    ssh_users: 'thiago'
