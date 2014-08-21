@@ -1,11 +1,11 @@
 from fabric.api import *
-from fabtools import require
 import fabtools
-import yaml
-
+from tasks import (deb,
+                   server,
+                   service)
 
 # Fabfile settings
-settings_file = 'settings.yaml'
+settings_file = ''
 
 hosts_list = ['192.168.1.107:8200']
 env.hosts = ['thiago@192.168.1.107:8200']
@@ -16,123 +16,6 @@ env.roledefs = {
     'web': [hosts_list[0]],
     'mail': [hosts_list[0]]
 }
-
-
-def load_settings(settings=settings_file):
-    '''
-    Load settings.yaml
-    This file contain:
-        - variables for templates
-        - packages for installation
-        - sources and destination folders
-        - etc
-    '''
-    try:
-        with open(settings) as stream:
-            data = yaml.load(stream)
-            return data
-    except IOError as error:
-        print ('File error: ' + str(error))
-
-
-@task
-def server_shutdown(time='now'):
-    '''
-    Shutdown server in a time (default=now)
-    '''
-    run('sudo shutdown -h ' + time)
-
-
-@task
-def server_restart():
-    '''
-    Restart server
-    '''
-    run('sudo restart -n')
-
-
-@task
-def repository_update():
-    '''
-    Update APT package definitions (apt-get update).
-    Only if specified time since last update already elapsed.
-    '''
-    require.deb.uptodate_index(max_age={'day': 1})
-
-
-@task
-def packages_install(packages=load_settings()):
-    '''
-    Require deb packages to be installed (string or list).
-    Set packages to be installed at settings.yaml.
-    '''
-    data = packages
-
-    repository_upgrade()
-
-    if type(data) == str:
-        require.deb.package(data)
-    if type(data) == dict:
-        if type(data['packages']) == list:
-            require.deb.packages(data['packages'])
-
-
-@task
-def packages_remove(packages=None):
-    '''
-    Require deb packages to be removed (string or list).
-    '''
-    if type(data) == str:
-        require.deb.nopackage(data)
-    if type(data) == list:
-        require.deb.nopackages(data)
-
-
-@task
-def packages_upgrade(safe=True):
-    '''
-    Upgrade system packages (safe upgrade is default: safe=True)
-    '''
-
-    repository_update()
-
-    if safe:
-        sudo('apt-get upgrade -y')
-    else:
-        sudo('apt-get dist-upgrade -y')
-
-
-@task
-def service_restart(service=None):
-    '''
-    Require a service to be restarted.
-    '''
-    require.service.restarted(service)
-
-
-@task
-def service_start(service=None):
-    '''
-    Require a service to be started.
-    '''
-    require.service.started(service)
-
-
-@task
-def service_stop(service=None):
-    '''
-    Require a service to be stopped.
-    '''
-    require.service.stopped(service)
-
-
-@task
-def service_running(service=None):
-    '''
-    Check if service is running.
-    '''
-    if fabtools.service.is_running(service):
-        print "Service is running!"
 
 
 @task
