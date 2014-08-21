@@ -61,14 +61,45 @@ def repository_update():
 
 
 @task
-def packages_install():
+def packages_install(packages=load_settings()):
     '''
-    Require several deb packages to be installed.
+    Require deb packages to be installed (string or list).
     Set packages to be installed at settings.yaml.
     '''
-    load_settings()
+    data = packages
+
     repository_upgrade()
-    require.deb.packages(data['packages'])
+
+    if type(data) == str:
+        require.deb.package(data)
+    if type(data) == dict:
+        if type(data['packages']) == list:
+            require.deb.packages(data['packages'])
+
+
+@task
+def packages_remove(packages=None):
+    '''
+    Require deb packages to be removed (string or list).
+    '''
+    if type(data) == str:
+        require.deb.nopackage(data)
+    if type(data) == list:
+        require.deb.nopackages(data)
+
+
+@task
+def packages_upgrade(safe=True):
+    '''
+    Upgrade system packages (safe upgrade is default: safe=True)
+    '''
+
+    repository_update()
+
+    if safe:
+        sudo('apt-get upgrade -y')
+    else:
+        sudo('apt-get dist-upgrade -y')
 
 
 @task
@@ -116,8 +147,11 @@ def upload_templates(template=None):
                                    context=data[template]['settings'],
                                    use_jinja=True,
                                    template_dir=data[template]['source'],
-                                   use_sudo=True, backup=True,
-                                   mirror_local_mode=False, mode=None,
-                                   mkdir=False, chown=False,
+                                   use_sudo=True,
+                                   backup=True,
+                                   mirror_local_mode=False,
+                                   mode=None,
+                                   mkdir=False,
+                                   chown=False,
                                    user=None
                                    )
