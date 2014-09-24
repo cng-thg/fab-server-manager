@@ -1,6 +1,10 @@
 packages:
-  - ufw
-  - fail2ban
+  install:
+    - ufw
+    - dpkg
+  remove:
+    - fail2ban
+    - nginx
 
 names:
   - Thiago

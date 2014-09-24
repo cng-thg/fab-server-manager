@@ -5,6 +5,7 @@ from tasks import (deb,
                    service)
 
 # Fabfile settings
+"""
 settings_file = ''
 
 hosts_list = ['192.168.1.107:8200']
@@ -16,7 +17,7 @@ env.roledefs = {
     'web': [hosts_list[0]],
     'mail': [hosts_list[0]]
 }
-
+"""
 
 @task
 def upload_templates(template=None):

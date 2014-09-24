@@ -31,13 +31,18 @@ def pkg(packages=load_settings(settings_file)):
         if type(data['packages']) == list:
             print(data['packages'])
 
-
 @task
-def install(packages):
+def install(packages=load_settings(settings_file)):
     '''
     Require deb packages to be installed (string or list).
     Set packages to be installed at settings.yaml.
     '''
+    """
+    TODO:
+        - read install and remove lists from packages dictionary
+        in packages.yaml
+        - change packages.yaml to deb.yaml
+    """
     data = packages
 
     update()
